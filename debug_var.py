@@ -47,16 +47,16 @@ class DebugVarCommand(sublime_plugin.TextCommand):
 			# 如果含 M D 这样的Thinkphp函数名，那么输出 getLastSql 或 _sql
 			# 
 			# python可以边赋值边判断真假？
-			D_match = re.match(r'.*(D\([\s\'\"]*?' + var_name + '.*?\))\s*-', line_cont)
-			M_match = re.match(r'.*(M\([\s\'\"]*?' + var_name + '.*?\))\s*-', line_cont)
+			sql_match = re.match(r'.*([DM]{1}\([\s\'\"]*?' + var_name + '.*?\))\s*-', line_cont)
 			this_var = re.match(r'.*?(\$this->' + var_name + ')', line_cont)
-			if D_match:
-				tp_m = D_match.group(1)
-
-			elif M_match:
-				tp_m = M_match.group(1)
+			var_sql = re.match(r'.*([DM]{1})\(\$' + var_name + '\)', line_cont)
+			# sublime.message_dialog(str(this_var))
+			if sql_match:
+				tp_m = sql_match.group(1)
 			else:
 				tp_m = False
+
+			indent_str = count_indent(line_cont)
 
 			if line_cont == '':
 				debug_str = ''	
@@ -65,15 +65,12 @@ class DebugVarCommand(sublime_plugin.TextCommand):
 
 			#处理php中，$this->这种情况
 			elif this_var:
-				indent_str = count_indent(line_cont)
 				debug_str = "\n" + indent_str + deal_fun + '($this->'+ var_name + ')' + sep;
-
 			elif tp_m:
-				indent_str = count_indent(line_cont)
 				debug_str = '\n' + indent_str + deal_fun + '(' + tp_m + '->_sql());'
-
+			elif var_sql:
+				debug_str = "\n" + indent_str + deal_fun + '(' + prex + var_name + ', ' + var_sql.group(1) + '(' + prex + var_name + ')->_sql()' + ')' + sep;
 			else:
-				indent_str = count_indent(line_cont)
 				debug_str = "\n" + indent_str + deal_fun + '(' + prex + var_name + ')' + sep;
 
 			if i == total_len:
