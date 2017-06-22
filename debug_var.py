@@ -43,6 +43,8 @@ class DebugVarCommand(sublime_plugin.TextCommand):
 			var_name = self.view.substr(self.view.word(region.begin()))
 			line_cont = self.view.substr(self.view.line(region.begin()))
 
+			sep_pos = self.view.find(r'[' + sep + ']{1}$', region.begin());
+
 			# 如果当前行为空，那么直接输出结束符
 			# 如果含 M D 这样的Thinkphp函数名，那么输出 getLastSql 或 _sql
 			# 
@@ -76,7 +78,10 @@ class DebugVarCommand(sublime_plugin.TextCommand):
 			if i == total_len:
 				debug_str += end
 
-			pos = self.view.line(region).end()
+			if sep_pos:
+				pos = sep_pos.end()
+			else:
+				pos = self.view.line(region).end()
 			if pos in all_str.keys():
 				all_str[pos] += debug_str.strip()
 			else:
