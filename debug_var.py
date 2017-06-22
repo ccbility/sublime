@@ -50,13 +50,19 @@ class DebugVarCommand(sublime_plugin.TextCommand):
 			# 
 			# python可以边赋值边判断真假？
 			sql_match = re.match(r'.*([DM]{1}\([\s\'\"]*?' + var_name + '.*?\))\s*-', line_cont)
+			C_match = re.match(r'.*([C]{1}\([\s\'\"]*?' + var_name + '.*?\))\s*', line_cont)
 			this_var = re.match(r'.*?(\$this->' + var_name + ')', line_cont)
 			var_sql = re.match(r'.*([DM]{1})\(\$' + var_name + '\)', line_cont)
-			# sublime.message_dialog(str(this_var))
+			# sublime.message_dialog(str(C_match))
 			if sql_match:
 				tp_m = sql_match.group(1)
 			else:
 				tp_m = False
+
+			if C_match:
+				tp_c = C_match.group(1)
+			else:
+				tp_c = False
 
 			indent_str = count_indent(line_cont)
 
@@ -70,6 +76,8 @@ class DebugVarCommand(sublime_plugin.TextCommand):
 				debug_str = "\n" + indent_str + deal_fun + '($this->'+ var_name + ')' + sep;
 			elif tp_m:
 				debug_str = '\n' + indent_str + deal_fun + '(' + tp_m + '->_sql());'
+			elif tp_c:
+				debug_str = '\n' + indent_str + deal_fun + '(' + tp_c + ');'
 			elif var_sql:
 				debug_str = "\n" + indent_str + deal_fun + '(' + prex + var_name + ', ' + var_sql.group(1) + '(' + prex + var_name + ')->_sql()' + ')' + sep;
 			else:
