@@ -38,6 +38,7 @@ class DebugVarCommand(sublime_plugin.TextCommand):
 		total_len = len(self.view.sel())
 		move_bool = True
 		all_str = collections.OrderedDict()#有序字典
+		all_str_indent = collections.OrderedDict()#有序字典对应的缩进
 		for region in self.view.sel():#所有光标所在的点
 			# sublime.message_dialog(str(var_name))
 			var_name = self.view.substr(self.view.word(region.begin()))
@@ -67,12 +68,12 @@ class DebugVarCommand(sublime_plugin.TextCommand):
 
 			indent_str = count_indent(line_cont)
 
-			if line_cont == '':
-				debug_str = ''	
-				move_bool = False
-				#当前行为空时，直接输出一个结束符
+			pos_bool = False
 
 			#处理php中，$this->这种情况
+			if line_cont == '':
+				debug_str = ''	
+				pos_bool = True
 			elif this_var:
 				debug_str = "\n" + indent_str + deal_fun + '($this->'+ var_name + ')' + sep;
 			elif tp_m:
@@ -87,7 +88,9 @@ class DebugVarCommand(sublime_plugin.TextCommand):
 			if i == total_len:
 				debug_str += end
 
-			if sep_pos:
+			if pos_bool:
+				pos = self.view.line(region).begin()
+			elif sep_pos:
 				pos = sep_pos.end()
 			else:
 				pos = self.view.line(region).end()
@@ -95,6 +98,7 @@ class DebugVarCommand(sublime_plugin.TextCommand):
 				all_str[pos] += debug_str.strip()
 			else:
 				all_str[pos] = debug_str
+				all_str_indent[pos] = len(indent_str) # 为了光标和输出的字符对齐
 			# self.view.insert(edit, self.view.line(region).end(), debug_str)
 			i += 1
 
@@ -102,10 +106,12 @@ class DebugVarCommand(sublime_plugin.TextCommand):
 		# sublime.message_dialog(str(all_str))
 		offset = 0 #我们自己插入的字符，会影响后面要插入字符的定位
 		#要按照key的大小输出，不然乱序
+		
+		# 清空光标
+		self.view.sel().clear()
+		
 		for k in all_str:
-			self.view.insert(edit, k + offset, all_str[k])
+			tmp_pos = k + offset
+			self.view.insert(edit, tmp_pos, all_str[k])
 			offset += len(all_str[k])
-		if move_bool:
-			#为了解决一行字符过长导致定位错误的问题，先让它走到行尾再press down
-			self.view.run_command("move_to", {"to": "hardeol"})	
-			self.view.run_command("move", {"by": "lines", "forward": True})	
+			self.view.sel().add(sublime.Region(tmp_pos + 1 + all_str_indent[k]))
