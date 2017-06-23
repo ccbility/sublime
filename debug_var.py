@@ -18,16 +18,22 @@ class DebugVarCommand(sublime_plugin.TextCommand):
 		# 获取文件的后缀，结果 .py .php .html .htm
 		if ext == '.php':
 			prex = '$'
+			line_end = '[;{]'
+			func_mark = 'function'
 			sep = ';'
 			deal_fun = 'var_dump'
 			end = 'die;'
 		elif ext == '.html' or ext == '.htm' or ext == '.js':
 			prex = ''
+			line_end = '.'
+			func_mark = 'function'
 			sep = ';'
 			deal_fun = 'console.log'
 			end = 'return false;'
 		elif ext == '.py':
 			prex = ''
+			line_end = '.'
+			func_mark = 'def:'
 			sep = ';'
 			deal_fun = 'print'
 			end = 'exit();'
@@ -45,7 +51,12 @@ class DebugVarCommand(sublime_plugin.TextCommand):
 			line_cont = self.view.substr(self.view.line(region.begin()))
 
 			# 考虑到 $ // 的注释情况
-			sep_pos = self.view.find(r'[' + sep + ']{1}[^\r\n]*$', region.begin());
+			# sep_pos = self.view.find(r'[' + line_end + ']{1}[^\r\n]*$', region.begin());
+			# sep_pos = self.view.find(r'\s*?[' + line_end + ']{1}', region.begin());
+			sep_pos = self.view.find(r'.{1}(?<=' + line_end + '{1})$', region.begin());
+			# self.view.find 是一直往下查找，直到找到
+			is_func = re.search(r'[%s]+' % func_mark, line_cont)
+			# sublime.message_dialog(str(is_func))
 
 			# 如果当前行为空，那么直接输出结束符
 			# 如果含 M D 这样的Thinkphp函数名，那么输出 getLastSql 或 _sql
@@ -67,6 +78,8 @@ class DebugVarCommand(sublime_plugin.TextCommand):
 				tp_c = False
 
 			indent_str = count_indent(line_cont)
+			if is_func:
+				indent_str += '    '
 
 			pos_bool = False
 
