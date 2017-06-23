@@ -54,7 +54,8 @@ class DebugVarCommand(sublime_plugin.TextCommand):
 			# 考虑到 $ // 的注释情况
 			# sep_pos = self.view.find(r'[' + line_end + ']{1}[^\r\n]*$', region.begin());
 			# sep_pos = self.view.find(r'\s*?[' + line_end + ']{1}', region.begin());
-			sep_pos = self.view.find(r'.{1}(?<=' + line_end + '{1})$', region.begin());
+			sep_pos = self.view.find(r'.{1}(?<=' + line_end + '{1})', region.begin());
+			# sep_pos = self.view.find(r'%s{1}(?=\s{1})' % line_end, region.begin());
 			# self.view.find 是一直往下查找，直到找到
 			is_func = line_cont.find(func_mark)
 
