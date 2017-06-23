@@ -48,6 +48,7 @@ class DebugVarCommand(sublime_plugin.TextCommand):
 		for region in self.view.sel():#所有光标所在的点
 			# sublime.message_dialog(str(var_name))
 			var_name = self.view.substr(self.view.word(region.begin()))
+			area_var = self.view.substr(region) # 光标所包裹的内容
 			line_cont = self.view.substr(self.view.line(region.begin()))
 
 			# 考虑到 $ // 的注释情况
@@ -55,8 +56,7 @@ class DebugVarCommand(sublime_plugin.TextCommand):
 			# sep_pos = self.view.find(r'\s*?[' + line_end + ']{1}', region.begin());
 			sep_pos = self.view.find(r'.{1}(?<=' + line_end + '{1})$', region.begin());
 			# self.view.find 是一直往下查找，直到找到
-			is_func = re.search(r'[%s]+' % func_mark, line_cont)
-			# sublime.message_dialog(str(is_func))
+			is_func = line_cont.find(func_mark)
 
 			# 如果当前行为空，那么直接输出结束符
 			# 如果含 M D 这样的Thinkphp函数名，那么输出 getLastSql 或 _sql
@@ -78,7 +78,7 @@ class DebugVarCommand(sublime_plugin.TextCommand):
 				tp_c = False
 
 			indent_str = count_indent(line_cont)
-			if is_func:
+			if is_func != -1:
 				indent_str += '    '
 
 			pos_bool = False
@@ -87,6 +87,8 @@ class DebugVarCommand(sublime_plugin.TextCommand):
 			if line_cont == '':
 				debug_str = ''	
 				pos_bool = True
+			elif area_var:
+				debug_str = "\n" + indent_str + deal_fun + '('+ area_var + ')' + sep;
 			elif this_var:
 				debug_str = "\n" + indent_str + deal_fun + '($this->'+ var_name + ')' + sep;
 			elif tp_m:
