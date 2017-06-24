@@ -32,7 +32,7 @@ class DebugVarCommand(sublime_plugin.TextCommand):
 			end = 'return false;'
 		elif ext == '.py':
 			prex = ''
-			line_end = '.'
+			line_end = '\r\n'
 			func_mark = 'def:'
 			sep = ';'
 			deal_fun = 'print'
