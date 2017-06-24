@@ -46,7 +46,6 @@ class DebugVarCommand(sublime_plugin.TextCommand):
 		all_str = collections.OrderedDict()#有序字典
 		all_str_indent = collections.OrderedDict()#有序字典对应的缩进
 		for region in self.view.sel():#所有光标所在的点
-			# sublime.message_dialog(str(var_name))
 			var_name = self.view.substr(self.view.word(region.begin()))
 			area_var = self.view.substr(region) # 光标所包裹的内容
 			line_cont = self.view.substr(self.view.line(region.begin()))
@@ -59,28 +58,29 @@ class DebugVarCommand(sublime_plugin.TextCommand):
 			# self.view.find 是一直往下查找，直到找到
 			is_func = line_cont.find(func_mark)
 
+			indent_str = count_indent(line_cont)
+			if is_func != -1:
+				indent_str += '    '
+
 			# 如果当前行为空，那么直接输出结束符
 			# 如果含 M D 这样的Thinkphp函数名，那么输出 getLastSql 或 _sql
 			# 
 			# python可以边赋值边判断真假？
-			sql_match = re.match(r'.*([DM]{1}\([\s\'\"]*?' + var_name + '.*?\))\s*-', line_cont)
-			C_match = re.match(r'.*([C]{1}\([\s\'\"]*?' + var_name + '.*?\))\s*', line_cont)
-			this_var = re.match(r'.*?(\$this->' + var_name + ')', line_cont)
-			var_sql = re.match(r'.*([DM]{1})\(\$' + var_name + '\)', line_cont)
-			# sublime.message_dialog(str(C_match))
-			if sql_match:
-				tp_m = sql_match.group(1)
-			else:
-				tp_m = False
+			if not area_var:
+				sql_match = re.match(r'.*([DM]{1}\([\s\'\"]*?' + var_name + '.*?\))\s*-', line_cont)
+				C_match = re.match(r'.*([C]{1}\([\s\'\"]*?' + var_name + '.*?\))\s*', line_cont)
+				this_var = re.match(r'.*?(\$this->' + var_name + ')', line_cont)
+				var_sql = re.match(r'.*([DM]{1})\(\$' + var_name + '\)', line_cont)
+				# sublime.message_dialog(str(C_match))
+				if sql_match:
+					tp_m = sql_match.group(1)
+				else:
+					tp_m = False
 
-			if C_match:
-				tp_c = C_match.group(1)
-			else:
-				tp_c = False
-
-			indent_str = count_indent(line_cont)
-			if is_func != -1:
-				indent_str += '    '
+				if C_match:
+					tp_c = C_match.group(1)
+				else:
+					tp_c = False
 
 			pos_bool = False
 
@@ -89,7 +89,8 @@ class DebugVarCommand(sublime_plugin.TextCommand):
 				debug_str = ''	
 				pos_bool = True
 			elif area_var:
-				debug_str = "\n" + indent_str + deal_fun + '('+ area_var + ')' + sep;
+				# debug_str = "\n" + indent_str + deal_fun + '('+ area_var + ')' + sep;
+				debug_str = '\n%s%s(%s)%s' % (indent_str, deal_fun, area_var, sep)
 			elif this_var:
 				debug_str = "\n" + indent_str + deal_fun + '($this->'+ var_name + ')' + sep;
 			elif tp_m:
