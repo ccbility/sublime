@@ -19,21 +19,21 @@ class DebugVarCommand(sublime_plugin.TextCommand):
 		if ext == '.php':
 			prex = '$'
 			line_end = '[;{]'
-			func_mark = 'function'
+			need_indent_reg = r'(function|{$)'
 			sep = ';'
 			deal_fun = 'var_dump'
 			end = 'die;'
 		elif ext == '.html' or ext == '.htm' or ext == '.js':
 			prex = ''
 			line_end = '.'
-			func_mark = 'function'
+			need_indent_reg = r'(function|{$)'
 			sep = ';'
 			deal_fun = 'console.log'
 			end = 'return false;'
 		elif ext == '.py':
 			prex = ''
 			line_end = '\r\n'
-			func_mark = 'def:'
+			need_indent_reg = r'(def|:$)' #不单是函数定义需要tab，条件判断循环等也是需要的
 			sep = ';'
 			deal_fun = 'print'
 			end = 'exit();'
@@ -56,10 +56,11 @@ class DebugVarCommand(sublime_plugin.TextCommand):
 			sep_pos = self.view.find(r'.{1}(?<=' + line_end + '{1})', region.begin());
 			# sep_pos = self.view.find(r'%s{1}(?=\s{1})' % line_end, region.begin());
 			# self.view.find 是一直往下查找，直到找到
-			is_func = line_cont.find(func_mark)
+			is_indent = re.search(need_indent_reg, line_cont)
+			# sublime.message_dialog(str(is_indent))
 
 			indent_str = count_indent(line_cont)
-			if is_func != -1:
+			if is_indent:
 				indent_str += '    '
 
 			# 如果当前行为空，那么直接输出结束符
