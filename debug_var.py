@@ -61,7 +61,7 @@ class DebugVarCommand(sublime_plugin.TextCommand):
 
 			indent_str = count_indent(line_cont)
 			if is_indent:
-				indent_str += '    '
+				indent_str += '\t'
 
 			# 如果当前行为空，那么直接输出结束符
 			# 如果含 M D 这样的Thinkphp函数名，那么输出 getLastSql 或 _sql
