@@ -25,7 +25,7 @@ class DebugVarCommand(sublime_plugin.TextCommand):
 			end = 'die;'
 		elif ext == '.html' or ext == '.htm' or ext == '.js':
 			prex = ''
-			line_end = '[;{]'
+			line_end = '[\r\n]'
 			need_indent_reg = r'(function|{$)'
 			sep = ';'
 			deal_fun = 'console.log'
