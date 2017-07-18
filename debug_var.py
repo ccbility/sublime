@@ -21,21 +21,21 @@ class DebugVarCommand(sublime_plugin.TextCommand):
 			line_end = '[;{]'
 			need_indent_reg = r'(function|{$)'
 			sep = ';'
-			deal_fun = 'var_dump'
+			deal_fun = 'echo "<pre/>", var_export(%s, true), "</pre>"'
 			end = 'die;'
 		elif ext == '.html' or ext == '.htm' or ext == '.js':
 			prex = ''
 			line_end = '[\r\n]'
 			need_indent_reg = r'(function|{$)'
 			sep = ';'
-			deal_fun = 'console.log'
+			deal_fun = 'console.log(%s)'
 			end = 'return false;'
 		elif ext == '.py':
 			prex = ''
 			line_end = '\r\n'
 			need_indent_reg = r'(def|:$)' #不单是函数定义需要tab，条件判断循环等也是需要的
 			sep = ';'
-			deal_fun = 'print'
+			deal_fun = 'print(%s)'
 			end = 'exit();'
 		else:
 			exit()
@@ -91,17 +91,17 @@ class DebugVarCommand(sublime_plugin.TextCommand):
 				pos_bool = True
 			elif area_var:
 				# debug_str = "\n" + indent_str + deal_fun + '('+ area_var + ')' + sep;
-				debug_str = '\n%s%s(%s)%s' % (indent_str, deal_fun, area_var, sep)
+				debug_str = "\n" + indent_str + deal_fun % area_var + sep
 			elif this_var:
-				debug_str = "\n" + indent_str + deal_fun + '($this->'+ var_name + ')' + sep;
+				debug_str = "\n" + indent_str + deal_fun % ('$this->'+ var_name) + sep
 			elif tp_m:
-				debug_str = '\n' + indent_str + deal_fun + '(' + tp_m + '->_sql());'
+				debug_str = '\n' + indent_str + deal_fun % (tp_m + '->_sql()') + sep
 			elif tp_c:
-				debug_str = '\n' + indent_str + deal_fun + '(' + tp_c + ');'
+				debug_str = '\n' + indent_str + deal_fun % tp_c + sep
 			elif var_sql:
-				debug_str = "\n" + indent_str + deal_fun + '(' + prex + var_name + ', ' + var_sql.group(1) + '(' + prex + var_name + ')->_sql()' + ')' + sep;
+				debug_str = "\n" + indent_str + deal_fun % (prex + var_name) + sep +  deal_fun % ( var_sql.group(1) + '(' + prex + var_name + ')->_sql()') + sep;
 			else:
-				debug_str = "\n" + indent_str + deal_fun + '(' + prex + var_name + ')' + sep;
+				debug_str = "\n" + indent_str + deal_fun % (prex + var_name) + sep
 
 			if i == total_len:
 				debug_str += end
