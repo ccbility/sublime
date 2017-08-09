@@ -31,9 +31,9 @@
     { "keys": ["ctrl+shift+j"], "command": "join_lines" },
     { "keys": ["ctrl+;"], "command": "insert_snippet", "args": {"contents": ";"} },
     { "keys": ["}"], "command": "insert_snippet", "args": {"contents": "{$0}"} },
-    { "keys": ["f3"], "command": "insert_snippet", "args": {"contents": "<?php $0 ?>"} },
-    { "keys": ["f4"], "command": "insert_snippet", "args": {"contents": "?> $0 <?php"} },
-    { "keys": ["f6"], "command": "insert_snippet", "args": {"contents": "<?= $0 ?>"} },
+    { "keys": ["f3"], "command": "insert_snippet", "args": {"contents": "<?= $0 ?>"} },
+    { "keys": ["f6"], "command": "insert_snippet", "args": {"contents": "<?php $0 ?>"} },
+    { "keys": ["f7"], "command": "insert_snippet", "args": {"contents": "?> $0 <?php"} },
     { "keys": ["ctrl+'"], "command": "insert_snippet", "args": {"contents": ";"} },
     {
         "keys": [
@@ -71,41 +71,41 @@
             ]
         }
     },
-    {
-        "keys": [
-            "f1"
-        ], 
-        "command": "chain", 
-        "args" :{
-            "commands":[
-                ["expand_selection", {"to": "word"}],
-                ["copy"],
-                ["move_to", {"to": "hardeol"}],
-                ["insert", {"characters": "\n"}],
-                ["insert_snippet", {"contents": "var_dump("}],
-                ["insert", {"characters": "$"}],
-                ["paste"],
-                ["insert_snippet", {"contents": ");die;"}],
-            ]
-        }
-    },
-    {
-        "keys": [
-            "ctrl+f1"
-        ], 
-        "command": "chain", 
-        "args" :{
-            "commands":[
-                ["expand_selection", {"to": "word"}],
-                ["copy"],
-                ["move_to", {"to": "hardeol"}],
-                ["insert", {"characters": "\n"}],
-                ["insert_snippet", {"contents": "console.log("}],
-                ["paste"],
-                ["insert_snippet", {"contents": ");"}],
-            ]
-        }
-    },
+    // {
+    //     "keys": [
+    //         "f1"
+    //     ], 
+    //     "command": "chain", 
+    //     "args" :{
+    //         "commands":[
+    //             ["expand_selection", {"to": "word"}],
+    //             ["copy"],
+    //             ["move_to", {"to": "hardeol"}],
+    //             ["insert", {"characters": "\n"}],
+    //             ["insert_snippet", {"contents": "var_dump("}],
+    //             ["insert", {"characters": "$"}],
+    //             ["paste"],
+    //             ["insert_snippet", {"contents": ");die;"}],
+    //         ]
+    //     }
+    // },
+    // {
+    //     "keys": [
+    //         "ctrl+f1"
+    //     ], 
+    //     "command": "chain", 
+    //     "args" :{
+    //         "commands":[
+    //             ["expand_selection", {"to": "word"}],
+    //             ["copy"],
+    //             ["move_to", {"to": "hardeol"}],
+    //             ["insert", {"characters": "\n"}],
+    //             ["insert_snippet", {"contents": "console.log("}],
+    //             ["paste"],
+    //             ["insert_snippet", {"contents": ");\nreturn false;"}],
+    //         ]
+    //     }
+    // },
     { "keys": ["ctrl+7"], "command": "move", "args": {"by": "characters", "forward": true}},
     { "keys": ["ctrl+8"], "command": "move_to", "args": {"to": "eol"}},
     { "keys": ["ctrl+shift+n"], "command": "advanced_new_file_new"},
@@ -113,4 +113,5 @@
     { "keys": ["alt+left"], "command": "goto_python_definition" },
     { "keys": ["alt+right"], "command": "back_to_python_definition" },
     { "keys": ["ctrl+b"], "command": "clone_file" },
+    { "keys": ["f1"], "command": "debug_var" },
 ]
